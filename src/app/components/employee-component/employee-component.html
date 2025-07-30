@@ -1,0 +1,102 @@
+<div class="row">
+  <div class="col-xl-12">
+    <app-card cardTitle="Personel Listesi" [options]="false" blockClass="table-border-style">
+
+      <!-- Arama Kısmı -->
+      <div class="mb-3">
+        <div class="input-group">
+          <input type="text" class="form-control"
+                 placeholder="Sicil, Ad, Soyad, Tarih, Firma, Cami, E-posta veya Telefon ile ara..."
+                 [(ngModel)]="searchTerm"
+                 (keyup.enter)="search()">
+          <button class="btn btn-primary ms-2" type="button" (click)="search()">
+            <i class="fa fa-search"></i> Ara
+          </button>
+          <!-- İSTEK: Butonlar arasına boşluk eklemek için "ms-2" sınıfı eklendi. -->
+          <button class="btn btn-secondary ms-1" type="button" (click)="clearSearch()">
+            <i class="fa fa-times"></i> Temizle
+          </button>
+        </div>
+      </div>
+
+      <!-- Yükleme Durumu -->
+      <div *ngIf="isLoading" class="text-center p-3">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+        <p>Veriler yükleniyor...</p>
+      </div>
+
+      <!-- Hata Mesajı -->
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Veri Tablosu -->
+      <div *ngIf="!isLoading && !errorMessage"
+           class="table-responsive"
+           #tableContainer>
+        <!-- İSTEK: Satır vurgulama için "table-hover" sınıfı Bootstrap'ten de eklenebilir ama custom stil daha esnek. -->
+        <table class="table table-striped resizable-table">
+          <thead>
+            <tr>
+              <!-- 
+                DEĞİŞİKLİK: 
+                - (mousedown) eventi startResize fonksiyonunu doğru parametrelerle çağıracak şekilde güncellendi.
+                - [style.width] ve [style.minWidth] birleştirildi ve sadece width ayarlandı.
+                  Genişlik, önce `columnWidths` objesinden alınır, eğer orada yoksa varsayılan bir değer kullanılır.
+              -->
+                   <th data-column="employeeId" (mousedown)="startResize($event, 'employeeId')" (click)="sortData('employeeId')" [style.width]="columnWidths['employeeId'] ? columnWidths['employeeId'] + 'px' : '80px'" class="sortable" [class.active-sort]="sortColumn === 'employeeId'">
+                #<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'employeeId', 'fa-sort-up': sortColumn === 'employeeId' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'employeeId' && sortDirection === 'desc'}"></i></span>
+              </th>
+              <th data-column="firstName" (mousedown)="startResize($event, 'firstName')" (click)="sortData('firstName')" [style.width]="columnWidths['firstName'] ? columnWidths['firstName'] + 'px' : '120px'" class="sortable" [class.active-sort]="sortColumn === 'firstName'">
+                Ad<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'firstName', 'fa-sort-up': sortColumn === 'firstName' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'firstName' && sortDirection === 'desc'}"></i></span>
+              </th>
+              <th data-column="lastName" (mousedown)="startResize($event, 'lastName')" (click)="sortData('lastName')" [style.width]="columnWidths['lastName'] ? columnWidths['lastName'] + 'px' : '120px'" class="sortable" [class.active-sort]="sortColumn === 'lastName'">
+                Soyad<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'lastName', 'fa-sort-up': sortColumn === 'lastName' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'lastName' && sortDirection === 'desc'}"></i></span>
+              </th>
+              <th data-column="companyName" (mousedown)="startResize($event, 'companyName')" (click)="sortData('companyName')" [style.width]="columnWidths['companyName'] ? columnWidths['companyName'] + 'px' : '150px'" class="sortable" [class.active-sort]="sortColumn === 'companyName'">
+                Firma<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'companyName', 'fa-sort-up': sortColumn === 'companyName' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'companyName' && sortDirection === 'desc'}"></i></span>
+              </th>
+              <th data-column="mosqueName" (mousedown)="startResize($event, 'mosqueName')" (click)="sortData('mosqueName')" [style.width]="columnWidths['mosqueName'] ? columnWidths['mosqueName'] + 'px' : '150px'" class="sortable" [class.active-sort]="sortColumn === 'mosqueName'">
+                Cami<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'mosqueName', 'fa-sort-up': sortColumn === 'mosqueName' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'mosqueName' && sortDirection === 'desc'}"></i></span>
+              </th>
+              <th data-column="email" (mousedown)="startResize($event, 'email')" (click)="sortData('email')" [style.width]="columnWidths['email'] ? columnWidths['email'] + 'px' : '180px'" class="sortable" [class.active-sort]="sortColumn === 'email'">
+                E-posta<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'email', 'fa-sort-up': sortColumn === 'email' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'email' && sortDirection === 'desc'}"></i></span>
+              </th>
+              <th data-column="contact" (mousedown)="startResize($event, 'contact')" (click)="sortData('contact')" [style.width]="columnWidths['contact'] ? columnWidths['contact'] + 'px' : '120px'" class="sortable" [class.active-sort]="sortColumn === 'contact'">
+                Telefon<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'contact', 'fa-sort-up': sortColumn === 'contact' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'contact' && sortDirection === 'desc'}"></i></span>
+              </th>
+              <th data-column="deviceName" (mousedown)="startResize($event, 'deviceName')" (click)="sortData('deviceName')" [style.width]="columnWidths['deviceName'] ? columnWidths['deviceName'] + 'px' : '120px'" class="sortable" [class.active-sort]="sortColumn === 'deviceName'">
+                Cihaz<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'deviceName', 'fa-sort-up': sortColumn === 'deviceName' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'deviceName' && sortDirection === 'desc'}"></i></span>
+              </th>
+              <th data-column="registiration" (mousedown)="startResize($event, 'registiration')" (click)="sortData('registiration')" [style.width]="columnWidths['registiration'] ? columnWidths['registiration'] + 'px' : '120px'" class="sortable" [class.active-sort]="sortColumn === 'registiration'">
+                Kayıt Tarihi<span class="sort-icon"><i class="fa" [ngClass]="{'fa-sort': sortColumn !== 'registiration', 'fa-sort-up': sortColumn === 'registiration' && sortDirection === 'asc', 'fa-sort-down': sortColumn === 'registiration' && sortDirection === 'desc'}"></i></span>
+              </th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let employee of displayedEmployeeDetails; trackBy: trackByEmployeeId">
+              <td [title]="employee.employeeId">{{ employee.employeeId }}</td>
+              <td [title]="employee.firstName">{{ employee.firstName }}</td>
+              <td [title]="employee.lastName">{{ employee.lastName }}</td>
+              <td [title]="employee.companyName">{{ employee.companyName }}</td>
+              <td [title]="employee.mosqueName">{{ employee.mosqueName }}</td>
+              <td [title]="employee.email">{{ employee.email }}</td>
+              <td [title]="employee.contact">{{ employee.contact }}</td>
+              <td [title]="employee.deviceName">{{ employee.deviceName }}</td>
+              <td [title]="employee.registiration">{{ employee.registiration}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Veri Yoksa -->
+      <div *ngIf="!isLoading && !errorMessage && displayedEmployeeDetails.length === 0" class="alert alert-info">
+        Kayıtlı personel bulunamadı.
+      </div>
+
+    </app-card>
+  </div>
+</div>

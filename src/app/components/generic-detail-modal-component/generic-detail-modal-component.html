@@ -1,0 +1,95 @@
+<!-- Modal sadece isVisible true ise görünür -->
+<div class="modal-backdrop" *ngIf="isVisible" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <button class="close-button" (click)="close()">×</button>
+    <div class="modal-body" *ngIf="item && editableItem">
+
+      <!-- Sol Taraf: Resim Galerisi (Yeniden Tasarlandı) -->
+      <div class="image-gallery">
+        <div class="image-display-container">
+          <div *ngIf="isLoadingImages" class="spinner-container">
+            <div class="spinner"></div>
+          </div>
+          <ng-container *ngIf="!isLoadingImages">
+            <img *ngIf="images.length > 0" [src]="images[currentImageIndex]" class="main-image">
+            <div *ngIf="images.length === 0" class="no-image">
+              <i class="fa fa-image"></i>
+              <p>Resim Yok</p>
+            </div>
+          </ng-container>
+          <button *ngIf="isEditMode && images.length > 0" class="image-delete-btn"
+            (click)="onDeleteImage(images[currentImageIndex])" title="Resmi Sil">
+            <i class="fa fa-trash"></i>
+          </button>
+          <ng-container *ngIf="!isEditMode && images.length > 1">
+            <button class="slider-btn prev" (click)="prevImage()">&#10094;</button>
+            <button class="slider-btn next" (click)="nextImage()">&#10095;</button>
+            <div class="image-counter">{{ currentImageIndex + 1 }} / {{ images.length }}</div>
+          </ng-container>
+        </div>
+        <div class="image-edit-overlay" *ngIf="isEditMode">
+          <label for="file-upload" class="upload-button" title="Gözat"><i class="fa fa-plus"></i></label>
+          <input id="file-upload" type="file" (change)="onFileSelected($event)" accept="image/*" multiple>
+          <span class="file-name">{{ selectedFile ? selectedFile.name : 'Dosya seçilmedi' }}</span>
+          <button class="btn btn-sm btn-info" (click)="onUploadImage()" [disabled]="!selectedFile">Yükle</button>
+        </div>
+      </div>
+
+      <!-- Sağ Taraf: Bilgiler -->
+      <div class="item-details">
+        <div class="details-header">
+          <h3>Detaylar</h3>
+          <div class="actions">
+            <ng-container *ngIf="!isEditMode">
+              <button class="btn btn-primary" (click)="toggleEditMode()">Güncelle</button>
+              <button class="btn btn-danger" (click)="onDelete()">Sil</button>
+            </ng-container>
+            <ng-container *ngIf="isEditMode">
+              <button class="btn btn-success" (click)="onSave()">Kaydet</button>
+              <button class="btn btn-secondary" (click)="cancelEdit()">İptal</button>
+            </ng-container>
+          </div>
+        </div>
+
+        <dl>
+          <ng-container *ngFor="let col of columns">
+            <ng-container *ngIf="col.renderAs !== 'image-key'">
+              <dt>{{ col.header }}</dt>
+              <dd>
+                <!-- DÜZENLEME MODU -->
+                <ng-container *ngIf="isEditMode">
+                  <ng-container *ngIf="col.editable === false; else editableField">
+                    <span>{{ editableItem[col.field] || 'N/A' }}</span>
+                  </ng-container>
+                  <ng-template #editableField>
+                    <ng-container [ngSwitch]="col.renderAs">
+                      <!-- YENİ: ng-select, artık tamamen generic bir şekilde çalışıyor -->
+                      <ng-select *ngSwitchCase="'dropdown'"
+                        [items]="col.parentIdentifier ? filteredDropdownOptions[col.field] : dropdownData[col.field]"
+                        bindLabel="name" bindValue="id" [(ngModel)]="editableItem[col.field]" [clearable]="true"
+                        notFoundText="Sonuç bulunamadı" placeholder="Seçim yapın..."
+                        (change)="onParentDropdownChange(col, $event?.id)">
+                      </ng-select>
+                      <input *ngSwitchDefault type="text" class="form-control" [(ngModel)]="editableItem[col.field]">
+                    </ng-container>
+                  </ng-template>
+                </ng-container>
+
+                <!-- GÖSTERİM MODU -->
+                <ng-container *ngIf="!isEditMode">
+                  <ng-container [ngSwitch]="col.renderAs">
+                    <a *ngSwitchCase="'tel'" [href]="'tel:' + item[col.field]">{{ item[col.field] }}</a>
+                    <a *ngSwitchCase="'mailto'" [href]="'mailto:' + item[col.field]">{{ item[col.field] }}</a>
+                    <!-- DÜZELTME: Hata artık fonksiyon ile çözülüyor -->
+                    <span *ngSwitchCase="'dropdown'">{{ getDropdownDisplayValue(col.field, item[col.field]) }}</span>
+                    <span *ngSwitchDefault>{{ item[col.field] || 'N/A' }}</span>
+                  </ng-container>
+                </ng-container>
+              </dd>
+            </ng-container>
+          </ng-container>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>

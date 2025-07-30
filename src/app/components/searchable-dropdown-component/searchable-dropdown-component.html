@@ -1,0 +1,15 @@
+<div class="dropdown-wrapper" (mouseleave)="showOptions = false">
+      <input type="text" class="form-control" 
+             [value]="selectedOptionName" 
+             (focus)="showOptions = true" 
+             (input)="filterOptions($event)"
+             [placeholder]="placeholder">
+      <div *ngIf="showOptions" class="options-container">
+        <div *ngFor="let option of filteredOptions" 
+             class="option-item" 
+             (click)="selectOption(option)">
+          {{ option.name }}
+        </div>
+        <div *ngIf="filteredOptions.length === 0" class="option-item disabled">Sonuç bulunamadı</div>
+      </div>
+    </div>

@@ -1,0 +1,59 @@
+/* Bu dosya, orijinal employee-component.scss dosyanızdaki stillerin aynısını içerebilir. */
+/* Stiller genele uygun olduğu için doğrudan kopyalanabilir. */
+
+.resizable-table {
+  table-layout: fixed;
+  width: 100%;
+
+  th {
+    position: relative;
+    user-select: none; // Metin seçimini engelle
+
+    &.sortable {
+      cursor: pointer;
+    }
+
+    // Boyutlandırma tutamacı için görsel ipucu
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 5px;
+      height: 100%;
+      cursor: col-resize;
+      background-color: transparent;
+      transition: background-color 0.2s;
+    }
+
+    // Fare ile üzerine gelince tutamacı göster
+    &:hover::after {
+      background-color: #007bff;
+      opacity: 0.5;
+    }
+
+    .sort-icon {
+      margin-left: 8px;
+      color: #999;
+      width: 1em;
+      display: inline-block;
+    }
+
+    &.active-sort .sort-icon {
+      color: #333;
+    }
+  }
+
+  tbody tr {
+    cursor: pointer;
+    &:hover {
+      background-color: #cfe2ff; // Açık mavi arka plan
+    }
+  }
+
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

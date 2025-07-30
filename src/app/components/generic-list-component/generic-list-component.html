@@ -1,0 +1,67 @@
+<!-- Arama Kısmı -->
+<div class="mb-3">
+  <div class="input-group">
+    <input type="text" class="form-control" placeholder="Tüm sütunlarda ara..." [(ngModel)]="searchTerm" (keyup)="search()">
+    <button class="btn btn-primary ms-2" type="button" (click)="search()">
+      <i class="fa fa-search"></i> Ara
+    </button>
+    <button class="btn btn-secondary ms-1" type="button" (click)="clearSearch()">
+      <i class="fa fa-times"></i> Temizle
+    </button>
+  </div>
+</div>
+
+<!-- Yükleme Durumu -->
+<div *ngIf="isLoading" class="text-center p-3">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Yükleniyor...</span>
+  </div>
+  <p>Veriler yükleniyor...</p>
+</div>
+
+<!-- Hata Mesajı -->
+<div *ngIf="errorMessage" class="alert alert-danger">
+  {{ errorMessage }}
+</div>
+
+<!-- Veri Tablosu -->
+<div *ngIf="!isLoading && !errorMessage" class="table-responsive" #tableContainer>
+  <table class="table table-striped resizable-table">
+    <thead>
+      <tr>
+        <!-- Sütun başlıkları dinamik olarak oluşturuluyor -->
+        <th *ngFor="let col of columns"
+            [attr.data-column]="col.field"
+            (mousedown)="startResize($event, col.field)"
+            (click)="col.sortable !== false && sortData(col.field)"
+            [style.width]="columnWidths[col.field] ? columnWidths[col.field] + 'px' : col.initialWidth"
+            [class.sortable]="col.sortable !== false"
+            [class.active-sort]="sortColumn === col.field">
+          {{ col.header }}
+          <!-- Sıralama ikonu -->
+          <span *ngIf="col.sortable !== false" class="sort-icon">
+            <i class="fa" [ngClass]="{
+              'fa-sort': sortColumn !== col.field,
+              'fa-sort-up': sortColumn === col.field && sortDirection === 'asc',
+              'fa-sort-down': sortColumn === col.field && sortDirection === 'desc'
+            }"></i>
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Satırlar dinamik olarak oluşturuluyor -->
+      <tr *ngFor="let item of displayedData; trackBy: trackByFn" (click)="handleRowClick(item)">
+        <!-- Hücreler dinamik olarak oluşturuluyor -->
+        <td *ngFor="let col of columns" [title]="item[col.field]">
+          {{ item[col.field] }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Veri Yoksa -->
+<div *ngIf="!isLoading && !errorMessage && displayedData.length === 0" class="alert alert-info mt-3">
+  Gösterilecek kayıt bulunamadı.
+</div>

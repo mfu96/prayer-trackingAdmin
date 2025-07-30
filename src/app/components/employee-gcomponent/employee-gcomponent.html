@@ -1,0 +1,40 @@
+<div class="row">
+  <div class="col-xl-12">
+    <app-card cardTitle="Personel Listesi" [options]="false" blockClass="table-border-style">
+      
+      <!-- Yeni generic-list bileşenini burada kullanıyoruz -->
+
+    <app-generic-list-component
+       [data]="allEmployeeDetails"
+        [columns]="employeeListColumns"
+        [isLoading]="isLoading"
+        [errorMessage]="errorMessage"
+        (rowClicked)="handleEmployeeRowClick($event)">
+             
+    </app-generic-list-component>
+      
+
+    </app-card>
+  </div>
+</div>
+
+<!-- YENİ: Detay modalı bileşenini sayfanın sonuna ekle -->
+<!-- Bu bileşen, isDetailModalVisible true olana kadar görünmez olacak -->
+
+<app-generic-detail-modal-component
+  [isVisible]="isDetailModalVisible"
+  [isLoadingImages]="areImagesLoading"
+  [item]="selectedEmployee"
+  [columns]="employeeDetailColumns"
+  [images]="detailImages"
+[dropdownData]="dropdownData"
+  (closeModal)="closeDetailModal()"
+  (saveItem)="handleSaveEmployee($event)"
+  (deleteItem)="handleDeleteEmployee($event)"
+  (uploadImage)="handleUploadImage($event)"
+  (deleteImage)="handleDeleteImage($event)"  
+  > 
+</app-generic-detail-modal-component>
+
+<app-searchable-dropdown-component></app-searchable-dropdown-component>
+

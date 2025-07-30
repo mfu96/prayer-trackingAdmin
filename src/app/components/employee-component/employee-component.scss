@@ -1,0 +1,112 @@
+/* employee-component.scss */
+
+
+.resizable-table {
+  table-layout: fixed;
+  width: 100%;
+
+  th {
+    position: relative;
+    user-select: none;
+    
+    /* DÜZELTME: Görsel ipucu için `::after` pseudo-elementi kullanılıyor.
+       Bu, DOM'a fazladan element eklemez ve olayları engellemez.
+    */
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 5px;
+      height: 100%;
+      cursor: col-resize;
+      background-color: transparent;
+      transition: background-color 0.2s;
+    }
+
+    /* Fare ile sütun başlığının üzerine gelindiğinde mavi tutamacı göster */
+    &:hover::after {
+      background-color: #007bff;
+      opacity: 0.5;
+    }
+
+      /* YENİ: Sıralanabilir sütunlar için imleci değiştir */
+    &.sortable {
+      cursor: pointer;
+    }
+
+    /* YENİ: Sıralama ikonları için stil */
+    .sort-icon {
+      margin-left: 8px;
+      color: #999; /* Pasif ikon rengi */
+      width: 1em; /* İkon değiştiğinde kaymayı önlemek için yer ayır */
+      display: inline-block;
+    }
+
+    /* YENİ: Aktif sıralanan sütunun ikonunu belirginleştir */
+    &.active-sort .sort-icon {
+      color: #333;
+    }
+  }
+
+  tbody tr:hover {
+    background-color: #cfe2ff;
+    cursor: pointer;
+  }
+
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+
+  tbody tr:hover {
+    background-color: #cfe2ff;
+    cursor: pointer;
+  }
+  
+
+  // İSTEK: Fare ile üzerine gelinen satırı vurgulamak için eklendi.
+  tbody tr:hover {
+    background-color: #cfe2ff; // Açık mavi bir arka plan rengi
+    cursor: pointer; // Satırın tıklanabilir olduğu hissini verir.
+  
+  }
+  th.resizing::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background-color: #007bff;
+    cursor: col-resize;
+  }
+  
+  // td {
+  //   overflow: hidden;
+  //   text-overflow: ellipsis;
+  //   white-space: nowrap;  
+  //       max-width: 300px;
+
+  // }
+  
+  .resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    background-color: #007bff;
+    cursor: col-resize;
+    opacity: 0;
+    transition: opacity 0.2s;
+    
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+
